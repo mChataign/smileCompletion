@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Curves Control</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+</head>
+
+<body>
+    <center>
+        <h1>Select all curves that need correction</h1>
+        
+        <form method="post" action="/stats">
+            <input type="hidden" id="custId" name="err" value={{rmses}}>
+            {% set count = [ ] %}
+            {% for indice in indices %}
+            <div>
+                <h4>"Index : {{indice}} , Ric: .{{indices_ric[count|length]}}, Business Date : {{dates[count|length]}}"</h4>
+                <div style="position: relative;">
+                    <canvas id="chart{{indice}}" width="450" height="300" name="chart{{indice}}"></canvas>
+                    <canvas id="histo{{indice}}" width="450" height="300" name="chart{{indice}}"></canvas>
+
+
+                    <div style="position:absolute; top: 8px; right: 200px; display: inline;" id="ErrorOptions{{indice}}">
+                        <SELECT name="ErrorOptions{{indice}}" size="1">
+                            <OPTION>missing values
+                            <OPTION>not smooth
+                            <OPTION>discontinuity
+                            <OPTION>other
+                        </SELECT>
+                    </div>
+
+                    <div>
+                        <textarea rows="4" cols="50" name="comment{{indice}}" placeholder="Enter text here..." id="comment{{indice}}" style="display:none;"></textarea>
+                    </div>
+                </div>
+                <br />
+                <div>
+                    <input type="radio" value='correct' name='radiobut{{indice}}' id="radiocorrect{{indice}}" onClick="void_element('{{indice}}');" />correct
+                    <input type="radio" value='incorrect' name='radiobut{{indice}}' id="radioincorrect{{indice}}" onClick="element('{{indice}}');" />incorrect
+                </div>
+
+
+            </div>
+            </br>
+            <hr style="width: 400px;">
+            {% set __ = count.append(1) %}
+            {% endfor %}
+
+
+            </br>
+            </br>
+            </br>
+            <input type="submit" value='Go to Statistics'>
+			<input type="hidden" name="name_option" value={{name_option}}>
+            </br>
+            </br>
+            </br>
+        </form>
+        <form action="/">
+            <input type="submit" value='Go back to Indices'>
+            </br>
+            </br>
+            </br>
+        </form>
+
+
+
+        <script>
+       
+        //Preparing label first
+        var labels = [
+                    {% for item in labels %}
+                    "{{ item }}",
+                    {% endfor %}
+                    ]
+
+        //Finally preparing rmses 
+        var rmses = JSON.parse('{{ rmses|safe }}');
+
+        var selected_indices = [
+            {% for indice in selected_indices %}
+        {{ indice }},
+        {% endfor %}
+                ]
+           
+        //Now preparing selected dividends 
+        var dividends = JSON.parse('{{ dividends|safe }}');
+        
+        //Also preparing selected dividends decoded 
+        var dividends_decoded = JSON.parse('{{ dividends_decoded|safe }}');
+        
+		var seuil =  {{seuil}};
+        
+		function void_element(indice) {
+            
+            document.getElementById("comment" + indice).style.display = 'none';
+        }
+
+        function element(indice) {
+
+            document.getElementById("comment" + indice).style.display = 'inline';
+        }    
+       
+        for (var key in dividends) {
+            //displaying error type 
+
+            //document.getElementById("radioincorrect"+key).addEventListener('click', void_element(key));
+            //document.getElementById("radiocorrect"+key).addEventListener('click', element(key));
+            if (document.getElementById("radioincorrect" + key).checked) {
+
+                document.getElementById("comment" + key).style.display = 'inline';
+            }
+    
+            var divs = dividends[key]
+            var divs_deco = dividends_decoded[key]
+            for (var i in divs_deco) {
+                divs_deco[i] = Math.round(divs_deco[i]* 1000) / 1000
+                }
+            //we have to round divs_deco
+            //we define error level first
+            var mses = [rmses[key]]
+            var redcolorlevel1 = "rgba(188, 117, 129, 0.2)"
+            var redcolorlevel2 = "rgba(188, 117, 129, 1)"
+
+            var bluecolorlevel1 = "rgba(151,187,205,0.2)"
+            var bluecolorlevel2 = "rgba(151,187,205,1)"
+            if (mses > seuil) {
+                bluecolorlevel1 = redcolorlevel1
+                bluecolorlevel2 = redcolorlevel2
+            }
+
+
+            //Now we define the line and line decoded
+            var lineData = {
+
+                labels: labels,
+                datasets:
+                [{
+                    label: 'true data',
+                    fillColor: "rgba(151,187,205,0)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    bezierCurve: false,
+                    data: divs
+
+                }, {
+                    label: 'autoencoded data',
+                    fillColor: "rgba(151,205,169,0)",
+                    strokeColor: "rgba(151,205,169,1)",
+                    pointColor: "rgba(151,205,169,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,205,169,1)",
+                    bezierCurve: false,
+                    data: divs_deco,
+
+
+                    type: 'line'
+                }
+                ]
+            }
+
+
+            //And now we plot the error level
+            var barData = {
+                labels: ['error'],
+                datasets: [{
+                    fillColor: bluecolorlevel1,
+                    strokeColor: bluecolorlevel2,
+                    pointColor: bluecolorlevel2,
+                    data: mses
+                }
+                ]
+            }
+
+
+
+            Chart.defaults.global.animationSteps = 50;
+            Chart.defaults.global.tooltipYPadding = 16;
+            Chart.defaults.global.tooltipCornerRadius = 0;
+            Chart.defaults.global.tooltipTitleFontStyle = "normal";
+            Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+            Chart.defaults.global.animationEasing = "easeOutBounce";
+            Chart.defaults.global.responsive = false;
+            Chart.defaults.global.scaleLineColor = "black";
+            Chart.defaults.global.scaleFontSize = 16;
+
+
+
+            var mychart = document.getElementById("chart"+key).getContext("2d");
+            var myLine1 = new Chart(mychart).Line(lineData, {
+                scaleShowVerticalLines: true,
+                scaleShowGridLines: true,
+                barShowStroke: true,
+                scaleShowLabels: true,
+                bezierCurve: false
+            });
+
+            var mychart = document.getElementById("histo"+key).getContext("2d");
+            steps = 1
+            max = 1.2
+            // draw bar chart
+            new Chart(mychart).Bar(barData, {
+                scaleOverride: true,
+                scaleSteps: steps,
+                scaleStepWidth: 0.5,
+                scaleStartValue: 0,
+                scaleShowVerticalLines: true,
+                scaleShowGridLines: true,
+                barShowStroke: true,
+                scaleShowLabels: true
+            }
+            );
+            
+
+            
+    }
+
+		console.log(seuil);
+        
+
+
+
+
+      
+
+
+        </script>
+    </center>
+</body>
+</html>

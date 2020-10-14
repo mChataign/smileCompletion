@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.5.0/rg-1.1.0/datatables.min.css"/>
+        <style type="text/css">
+             /* general */
+            body {background: black; color: white; margin-left: 10px}
+            section:before {height: 60px;content: "";display:block;}
+            .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {}
+            a[data-toggle="pill"] {color:#a7d2ff;}
+            a[class="navbar-brand"] {color:white;}
+            a[id="navbarDropdownMenuLink"] {color:#ccc !important;}
+            span[class="navbar-text"] {color:#ccc !important;}
+            .popover-header, .modal-title, .modal-body {color:black;}
+
+            /* custom */
+            .mnitem {color:white !important;}
+            .tblink {color:#FFFF00;}
+            .tblink:hover {color:white;}
+            
+            .gblink {color:#FFFF00;}
+            .gblink:hover {color:#1AF663;}
+            .gbblink:hover {background-color:rgba(42, 187, 155, 0.4);}
+
+            .rblink {color:#FFFF00;}
+            .rblink:hover {color:red;}
+            .rbblink:hover {background-color:rgba(207, 0, 15, 0.4);}
+
+            
+            .yblink {color:#FFFF00;}
+            .yblink:hover {color:#FFC107;}
+            
+            .button-main {margin-right:20px;}
+
+            /* datatable */
+            table.dataTable tr.dtrg-group td{background-color: rgb(15,189,189,0.3) !important;}
+            *[role="row"] {background: black;}
+
+            /* output tables */
+            .tg {border-collapse:collapse;border-spacing:0;}
+            .tg td{font-family:Arial, sans-serif;font-size:14px;padding:2px 8px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;}
+            .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:2px 8px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;}
+            .tg .tg-eo7u{font-size:12px;color:#FFFFFF}
+            .tg .tg-okqd{font-weight:bold;font-size:12px;color:#FFFFFF;text-align:center}
+            .tg .tg-olr0{font-size:12px;color:#FFFFFF;text-align:center;white-space: nowrap}
+            .tg .tg-fev3{font-weight:bold;font-size:12px;}
+            .tg .tg-4mpc{font-size:12px;}
+            .tg .tg-huh2{font-size:12px;text-align:center}
+            .tg .tg-2wws{font-size:12px;color:#32cb00;text-align:center}
+            .tg .tg-72n7{font-size:12px;color:#fe0000;text-align:center}
+        </style>
+        <title>DeltaOneAnomalyDetection</title>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+        <script>history.scrollRestoration = "manual"</script>
+    </head>
+    <body>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.5.0/rg-1.1.0/datatables.min.js"></script>
+
+        <nav id="main-nav" class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">DeltaOneAnomalyDetection</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Regions</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="">US</a>
+                        <a class="dropdown-item" href="">EUROPE</a>
+                        <a class="dropdown-item" href="">ASIA</a>
+                        <a class="dropdown-item" href="">ALL</a>
+
+                    </div>
+                </li>
+                <li class="nav-item"><a class="nav-link mnitem" href="#indexes">Indexes <span class="badge badge-primary">{{len_indices_repo}}</span></a></li>
+                <li class="nav-item"><a class="nav-link mnitem" href="#Accuarte">Accurate <span class="badge badge-success">{{len_accurate_indices}}</span></a></li>
+                <li class="nav-item"><a class="nav-link mnitem" href="#errors">Errors <span class="badge badge-danger">{{len_outliers_indices}}</span></a></li>
+            </ul>
+            <button class="btn btn-sm btn-light refresh-page button-main" value="Open Window" onclick="openWin()">Doc</button>
+            <a href="#top"><button class="btn btn-sm btn-secondary refresh-page button-main" type="submit">Up</button></a>
+            <span id="report-meta" class="navbar-text"></span>
+            <span id="report-meta" class="navbar-text">Last Run : {{today_time_exact}} | All times in UTC{{time_zone}}</span>
+            </div>
+        </nav>
+        
+        <section id="Repo">
+            <h2>Repo Indexes</h2>
+            <div id="table-locations_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+				 <div class="row">
+					<div class="col-sm-12 col-md-6"></div>
+					<div class="col-sm-12 col-md-6"></div>
+					</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<table id="table-indices" class="table table-sm table-dark dataTable no-footer" style="width: 100%;" role="grid" aria-describedby="table-locations_info">
+						<thead><tr id="row_index" role="row"><th class="sorting_asc" tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="#: activate to sort column descending" style="width: 32.2031px;" aria-sort="ascending">#</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 200px;">Index</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Overnight batch: activate to sort column ascending" style="width: 127.203px;">Mnemo</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Save to Sophis: activate to sort column ascending" style="width: 127.203px;">Ric</th><th tabindex="0" aria-controls="table-locations" rowspan="1" colspan="1" aria-label="Location: activate to sort column ascending" style="width: 127.203px;">Check Date</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Last run: activate to sort column ascending" style="width: 50px;">Status</th></tr></thead>
+    						<tbody>
+                            {% for i in range(len_indices_repo) %}
+                                {% if rmses_repo[i] > seuil %}
+                                    <tr id="row_index{{i}}" role="row" class="odd rbblink"><td class="sorting_1">{{i+1}}</td><td class=""><a class="rblink" href="#row_error{{i}}">{{indices_repo[i]}}</td><td>{{indices_mnemo[i]}}</td><td>{{indices_ric[i]}}</td><td class="">{{dates_repo[i]}}</a></td><td><a tabindex="0" class="btn btn-danger btn-block" role="button" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="left" data-content="RMSE : {{(rmses_repo[i]*100)|round(2)}} %">ERR</a></td></tr>
+                                {% else %}
+                                    <tr id="row_index{{i}}" role="row" class="odd gbblink"><td class="sorting_1">{{i+1}}</td><td class=""><a class="gblink" href="#row_error{{i}}">{{indices_repo[i]}}</td><td>{{indices_mnemo[i]}}</td><td>{{indices_ric[i]}}</td><td class="">{{dates_repo[i]}}</a></td><td><a tabindex="0" class="btn btn-success btn-block" role="button"  data-container="body" data-toggle="popover" data-trigger="focus" data-placement="left"  data-content="RMSE : {{(rmses_repo[i]*100)|round(2)}} %">OK</a></td></tr>
+                                {% endif %}
+                            {% endfor %}
+                            
+                        </tbody>
+					</table>
+					</div>
+				</div>
+    		</div>
+        </section>
+
+       <section id="graphs">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <a class="navbar-brand" href="#graphs">Graphs</a>
+            <li class="nav-item"><a class="nav-link active" id="output-pills-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true">All Indexes</a></li>
+            <li class="nav-item"><a class="nav-link" id="output-pills-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="true">Accurate</a></li>
+            <li class="nav-item"><a class="nav-link" id="output-pills-tab-3" data-toggle="tab" href="#tab-3" role="tab" aria-controls="tab-3" aria-selected="true">Errors</a></li>
+            </ul>
+            
+            <div class="tab-content" id="pills-tabContent">
+            
+            <div id="tab-1" class="dataTables_wrapper dt-bootstrap4 no-footer tab-pane fade show active in" aria-labelledby="output-pills-tab-1">
+				 <div class="row">
+					<div class="col-sm-12 col-md-6"></div>
+					<div class="col-sm-12 col-md-6"></div>
+				  </div>
+				<div class="row">
+					<div class="col-sm-12">
+						<table id="table-errors1" class="table table-sm table-striped table-dark table-hover dataTable no-footer" style="table-layout:fixed" role="grid" aria-describedby="table-locations_info">
+						<thead><tr id="row_error" role="row"><th class="sorting_asc" tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="#: activate to sort column descending" style="width: 32.2031px;" aria-sort="ascending">#</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 200px;">Index</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Save to Sophis: activate to sort column ascending" style="width: 127.203px;">Mnemo</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 300px;">Repo Graph</th></tr></thead>
+    						<tbody> {% set count = [ ] %}                    
+                                {% for i in range(len_indices_repo) %}
+                                {% if rmses_repo[i] > seuil %}
+                                    {% set __ = count.append(1) %}
+                                    <tr id="row_error{{i}}" role="row" class="odd">
+                                    <td class="sorting_1">{{count|length}}</td>
+                                    <td class=""><a class="rblink" href="#row_index{{i}}">{{indices_repo[i]}}</td>
+                                    <td>{{indices_mnemo[i]}}</td>
+                                    <td><canvas id="chart1{{i}}" width="450" height="300" name="chart1{{i}}"></canvas></td>
+                                    </tr>                                    
+                                {% else%}
+                                    {% set __ = count.append(1) %}
+                                    <tr id="row_error{{i}}" role="row" class="odd">
+                                    <td class="sorting_1">{{count|length}}</td>
+                                    <td class=""><a class="gblink" href="#row_index{{i}}">{{indices_repo[i]}}</td>
+                                    <td>{{indices_mnemo[i]}}</td>
+                                    <td><canvas id="chart1{{i}}" width="450" height="300" name="chart1{{i}}"></canvas></td>
+                                    </tr>                                   
+                                {% endif %}
+                            {% endfor %}
+                            <script>
+                            
+                            var labels = JSON.parse('{{ labels|safe }}');
+
+                            var outliers_indices = [{% for item in outliers_indices %}
+                                                    "{{ item }}",
+                                                    {% endfor %}]
+                            var len_indices_repo =  {{len_indices_repo}};
+                            var seuil =  {{seuil}};
+                            
+                            //Now preparing selected dividends 
+                            var repo = JSON.parse('{{ repo_json|safe }}');
+                        
+                            //Also preparing selected dividends decoded 
+                            var repo_decoded = JSON.parse('{{ repo_decoded_json|safe }}');
+                            
+                        
+                            //Also preparing selected rmses 
+                            var rmses_repo = JSON.parse('{{ rmses_repo_json|safe }}');
+                            
+                            var i;
+                            for (i = 0; i < len_indices_repo ; i++) {
+                                
+                                var repos = repo[i]
+                                var label = labels[i]
+                                var repos_deco = repo_decoded[i]
+                                for (var j in repos_deco) {
+                                    repos_deco[j] = Math.round(repos_deco[j]* 1000) / 1000
+                                    }
+                                
+                                var redcolorlevel1 = "rgba(207, 0, 15, 0)"
+                                var redcolorlevel2 = "rgba(207, 0, 15, 1)"
+                                                    
+                                var greencolorlevel1 = "rgba(46, 204, 113, 0)"
+                                var greencolorlevel2 = "rgba(46, 204, 113, 1)"
+                                
+                                if (rmses_repo[i] > seuil) {
+                                    greencolorlevel1 = redcolorlevel1
+                                    greencolorlevel2 = redcolorlevel2
+                                }
+                                
+                                //Now we define the line and line decoded
+                                var lineData = {
+                    
+                                    labels: label,
+                                    datasets:
+                                    [{
+                                        name: 'true data',
+                                        fillColor: greencolorlevel1,
+                                        strokeColor: greencolorlevel2,
+                                        pointColor: greencolorlevel2,
+                                        pointStrokeColor: "#fff",
+                                        pointHighlightFill: "#fff",
+                                        pointHighlightStroke: greencolorlevel2,
+                                        bezierCurve: false,
+                                        showInLegend: true,
+                                        data: repos
+                    
+                                    }, {
+                                        name: 'autoencoded data',
+                                        fillColor: "rgba(0, 181, 204, 0)",
+                                        strokeColor: "rgba(0, 181, 204, 1)",
+                                        pointColor: "rgba(0, 181, 204, 1)",
+                                        pointStrokeColor: "#fff",
+                                        pointHighlightFill: "#fff",
+                                        pointHighlightStroke: "rgba(0, 181, 204, 1)",
+                                        bezierCurve: false,
+                                        data: repos_deco,
+                    
+                    
+                                        type: 'line'
+                                    }
+                                    ]
+                                } 
+                                    
+                    
+                                Chart.defaults.global.animationSteps = 20;
+                                Chart.defaults.global.tooltipYPadding = 16;
+                                Chart.defaults.global.tooltipCornerRadius = 0;
+                                Chart.defaults.global.tooltipTitleFontStyle = "normal";
+                                Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+                                Chart.defaults.global.animationEasing = "easeOutBounce";
+                                Chart.defaults.global.responsive = false;
+                                Chart.defaults.global.scaleLineColor = "white";
+                                Chart.defaults.global.scaleFontSize = 16;
+
+                    
+                    
+                                var mychart_div_1 = document.getElementById("chart1"+i).getContext("2d");
+
+                                var myLine1 = new Chart(mychart_div_1).Line(lineData, {
+
+                                    scaleShowVerticalLines: true,
+                                    scaleShowGridLines: true,
+                                    barShowStroke: true,
+                                    scaleShowLabels: true,
+                                    bezierCurve: false
+                                });
+                                                               
+                                }
+                            
+                        window.addEventListener("hashchange", function () {
+                        window.scrollTo(window.scrollX, window.scrollY - 55);
+                            });
+                        
+                        $(document).ready(function() {
+                                $('#table-errors1').DataTable( {
+                                    "lengthMenu": [[10, 25, -1], [10, 25, "All"]]
+                                } );
+                            });
+                    </script>
+                    </tbody>
+					</table>
+					</div>
+				</div>
+    		</div>
+            
+            
+           <div id="tab-2" class="dataTables_wrapper dt-bootstrap4 no-footer tab-pane fade" aria-labelledby="output-pills-tab-2">
+				 <div class="row">
+					<div class="col-sm-12 col-md-6"></div>
+					<div class="col-sm-12 col-md-6"></div>
+				  </div>
+				<div class="row">
+					<div class="col-sm-12">
+						<table id="table-errors2" class="table table-sm table-dark dataTable no-footer" style="table-layout:fixed" role="grid" aria-describedby="table-locations_info">
+						<thead><tr id="row_error" role="row"><th class="sorting_asc" tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="#: activate to sort column descending" style="width: 32.2031px;" aria-sort="ascending">#</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 200px;">Index</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Save to Sophis: activate to sort column ascending" style="width: 127.203px;">Mnemo</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 300px;">Graph</th></tr></thead>
+    						<tbody>
+                            {% for i in range(len_accurate_indices) %}
+                                    <tr id="row_error{{i}}" role="row" class="odd gbblink">
+                                    <td class="sorting_1">{{i+1}}</td>
+                                    <td class=""><a class="gblink" href="#row_index{{i}}">{{indices_repo[accurate_indices[i]]}}</td>
+                                    <td>{{indices_mnemo[accurate_indices[i]]}}</td>
+                                    <td><canvas id="chart2{{i}}" width="450" height="300" name="chart2{{i}}"></canvas></td>
+                                    </tr>
+                            {% endfor %}
+                            <script>
+                            function chartTab2() {
+
+                                                    var labels = JSON.parse('{{ labels|safe }}');
+
+                                                    var outliers_indices = [{% for item in outliers_indices %}
+                                                                            "{{ item }}",
+                                                                            {% endfor %}]
+                                                    var accurate_indices = [{% for item in accurate_indices %}
+                                                                            "{{ item }}",
+                                                                            {% endfor %}]
+                                                    var len_indices_repo =  {{len_indices_repo}};
+                                                    var len_accurate_indices =  {{len_accurate_indices}};
+                        
+                                                    //Now preparing selected repos 
+                                                    var repo = JSON.parse('{{ repo_json|safe }}');
+                                                
+                                                    //Also preparing selected repos decoded 
+                                                    var repo_decoded = JSON.parse('{{ repo_decoded_json|safe }}');
+                                                    
+                                                    var i;
+                                                    for (i = 0; i < len_accurate_indices ; i++) {
+                                                        var index = accurate_indices[i]
+                                                        var repos = repo[index]
+                                                        var label = labels[index]
+                                                        var repos_deco = repo_decoded[index]
+                                                        for (var j in repos_deco) {
+                                                            repos_deco[j] = Math.round(repos_deco[j]* 1000) / 1000
+                                                            }
+                                            
+                                                        //Now we define the line and line decoded
+                                                        var lineData_2 = {
+                                            
+                                                            labels: label,
+                                                            datasets:
+                                                            [{
+                                                                name: 'true data',
+                                                                fillColor: "rgba(46, 204, 113, 0)",
+                                                                strokeColor: "rgba(46, 204, 113, 1)",
+                                                                pointColor: "rgba(46, 204, 113, 1)",
+                                                                pointStrokeColor: "#fff",
+                                                                pointHighlightFill: "#fff",
+                                                                pointHighlightStroke: "rgba(46, 204, 113, 1)",
+                                                                bezierCurve: false,
+                                                                showInLegend: true,
+                                                                data: repos
+                                            
+                                                            }, {
+                                                                name: 'autoencoded data',
+                                                                fillColor: "rgba(0, 181, 204, 0)",
+                                                                strokeColor: "rgba(0, 181, 204, 1)",
+                                                                pointColor: "rgba(0, 181, 204, 1)",
+                                                                pointStrokeColor: "#fff",
+                                                                pointHighlightFill: "#fff",
+                                                                pointHighlightStroke: "rgba(0, 181, 204, 1)",
+                                                                bezierCurve: false,
+                                                                data: repos_deco,
+                                            
+                                            
+                                                                type: 'line'
+                                                            }
+                                                            ]
+                                                        } 
+                                                            
+                                            
+                                                        Chart.defaults.global.animationSteps = 20;
+                                                        Chart.defaults.global.tooltipYPadding = 16;
+                                                        Chart.defaults.global.tooltipCornerRadius = 0;
+                                                        Chart.defaults.global.tooltipTitleFontStyle = "normal";
+                                                        Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+                                                        Chart.defaults.global.animationEasing = "easeOutBounce";
+                                                        Chart.defaults.global.responsive = false;
+                                                        Chart.defaults.global.scaleLineColor = "white";
+                                                        Chart.defaults.global.scaleFontSize = 16;
+                        
+                                            
+                                                        var mychart_div_2 = document.getElementById("chart2"+i).getContext("2d");
+
+                                                        var myLine2 = new Chart(mychart_div_2).Line(lineData_2, {
+
+                                                            scaleShowVerticalLines: true,
+                                                            scaleShowGridLines: true,
+                                                            barShowStroke: true,
+                                                            scaleShowLabels: true,
+                                                            bezierCurve: false
+                                                        });
+                                    myLine2.render();
+                                }
+                        window.addEventListener("hashchange", function () {
+                        window.scrollTo(window.scrollX, window.scrollY - 55);
+                            });
+                        
+                        $(document).ready(function() {
+                                $('#table-errors2').DataTable( {
+                                    "lengthMenu": [[10, 25, -1], [10, 25, "All"]]
+                                } );
+                            });
+                                
+                        }
+                                
+                        $('#output-pills-tab-2').on("shown.bs.tab",function(){
+                          chartTab2();
+                          $('#output-pills-tab-2').off(); // to remove the binded event after the initial rendering
+                      });
+                    </script>
+                    </tbody>
+					</table>
+					</div>
+				</div>
+    		</div>
+
+          <div id="tab-3" class="dataTables_wrapper dt-bootstrap4 no-footer tab-pane fade" aria-labelledby="output-pills-tab-3">
+				 <div class="row">
+					<div class="col-sm-12 col-md-6"></div>
+					<div class="col-sm-12 col-md-6"></div>
+				  </div>
+				<div class="row">
+					<div class="col-sm-12">
+						<table id="table-errors3" class="table table-sm table-dark dataTable no-footer" style="table-layout:fixed" role="grid" aria-describedby="table-locations_info">
+						<thead><tr id="row_error" role="row"><th class="sorting_asc" tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="#: activate to sort column descending" style="width: 32.2031px;" aria-sort="ascending">#</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 200px;">Index</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Save to Sophis: activate to sort column ascending" style="width: 127.203px;">Mnemo</th><th tabindex="0" aria-controls="table-indices" rowspan="1" colspan="1" aria-label="Indexes: activate to sort column ascending" style="width: 300px;">Graph</th></tr></thead>
+    						<tbody>
+                            {% for i in range(len_outliers_indices) %}
+                                    <tr id="row_error{{i}}" role="row" class="odd rbblink">
+                                    <td class="sorting_1">{{i+1}}</td>
+                                    <td class=""><a class="rblink" href="#row_index{{i}}">{{indices_repo[outliers_indices[i]]}}</td>
+                                    <td>{{indices_mnemo[outliers_indices[i]]}}</td>
+                                    <td><canvas id="chart3{{i}}" width="450" height="300" name="chart3{{i}}"></canvas></td>
+                                    </tr>
+                            {% endfor %}
+                            <script>
+                            function chartTab3() {
+                                            var labels = JSON.parse('{{ labels|safe }}');
+
+                                            var outliers_indices = [{% for item in outliers_indices %}
+                                                                    "{{ item }}",
+                                                                    {% endfor %}]
+                                            var accurate_indices = [{% for item in accurate_indices %}
+                                                                    "{{ item }}",
+                                                                    {% endfor %}]
+                                            var len_indices_repo =  {{len_indices_repo}};
+                                            var len_outliers_indices =  {{len_outliers_indices}};
+                
+                                            //Now preparing selected dividends 
+                                            var repo = JSON.parse('{{ repo_json|safe }}');
+                                        
+                                            //Also preparing selected dividends decoded 
+                                            var repo_decoded = JSON.parse('{{ repo_decoded_json|safe }}');
+                                            
+                                            var i;
+                                            for (i = 0; i < len_outliers_indices ; i++) {
+                                                var index = outliers_indices[i]
+                                                var repos = repo[index]
+                                                var label = labels[index]
+                                                var repos_deco = repo_decoded[index]
+                                                for (var j in repos_deco) {
+                                                    repos_deco[j] = Math.round(repos_deco[j]* 1000) / 1000
+                                                    }
+                                    
+                                                //Now we define the line and line decoded
+                                                var lineData_3 = {
+                                    
+                                                    labels: label,
+                                                    datasets:
+                                                    [{
+                                                        name: 'true data',
+                                                        fillColor: "rgba(207, 0, 15, 0)",
+                                                        strokeColor: "rgba(207, 0, 15, 1)",
+                                                        pointColor: "rgba(207, 0, 15, 1)",
+                                                        pointStrokeColor: "#fff",
+                                                        pointHighlightFill: "#fff",
+                                                        pointHighlightStroke: "rgba(207, 0, 15, 1)",
+                                                        bezierCurve: false,
+                                                        showInLegend: true,
+                                                        data: repos
+                                    
+                                                    }, {
+                                                        name: 'autoencoded data',
+                                                        fillColor: "rgba(0, 181, 204, 0)",
+                                                        strokeColor: "rgba(0, 181, 204, 1)",
+                                                        pointColor: "rgba(0, 181, 204, 1)",
+                                                        pointStrokeColor: "#fff",
+                                                        pointHighlightFill: "#fff",
+                                                        pointHighlightStroke: "rgba(0, 181, 204, 1)",
+                                                        bezierCurve: false,
+                                                        data: repos_deco,
+                                    
+                                    
+                                                        type: 'line'
+                                                    }
+                                                    ]
+                                                } 
+                                                    
+                                    
+                                                Chart.defaults.global.animationSteps = 20;
+                                                Chart.defaults.global.tooltipYPadding = 16;
+                                                Chart.defaults.global.tooltipCornerRadius = 0;
+                                                Chart.defaults.global.tooltipTitleFontStyle = "normal";
+                                                Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+                                                Chart.defaults.global.animationEasing = "easeOutBounce";
+                                                Chart.defaults.global.responsive = false;
+                                                Chart.defaults.global.scaleLineColor = "white";
+                                                Chart.defaults.global.scaleFontSize = 16;
+                
+                                    
+                                                var mychart_div_3 = document.getElementById("chart3"+i).getContext("2d");
+
+                                                var myLine3 = new Chart(mychart_div_3).Line(lineData_3, {                        
+                                                    scaleShowVerticalLines: true,
+                                                    scaleShowGridLines: true,
+                                                    barShowStroke: true,
+                                                    scaleShowLabels: true,
+                                                    bezierCurve: false
+                                                });
+                                myLine3.render();
+                             }
+                                
+                        window.addEventListener("hashchange", function () {
+                        window.scrollTo(window.scrollX, window.scrollY - 55);
+                            });
+                        
+                        $(document).ready(function() {
+                                $('#table-errors3').DataTable( {
+                                    "lengthMenu": [[10, 25, -1], [10, 25, "All"]]
+                                } );
+                            });
+                         }      
+                        $('#output-pills-tab-3').on("shown.bs.tab",function(){
+                          chartTab3();
+                          $('#output-pills-tab-3').off(); // to remove the binded event after the initial rendering
+                      });
+                    </script>
+                    </tbody>
+					</table>
+					</div>
+				</div>
+    		</div>
+                  
+            
+        </div>
+        </section>
+        <!--RUNS-->
+
+        <script>
+        $(function () {
+        $('[data-toggle="popover"]').popover()
+                });
+        $(document).ready(function() {
+                $('#table-indices').DataTable( {
+                    "lengthMenu": [[10, 25, -1], [10, 25, "All"]]
+                } );
+            } );
+        // ========================== GLOBAL VAR ==========================
+
+            function openWin() {
+              window.open("https://confluence.hk.hsbc/display/D1TD/DeltaOne+-+Final+API+-+Anomaly+Detection+for+Repo+Curve");
+            }
+            function init_page() {
+                  window.scrollTo(0, 0);
+            }
+                
+            init_page();
+        </script>
+    </body>
+</html>

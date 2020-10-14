@@ -1,2 +1,0 @@
-# smileCompletion
-Completion of volatility

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Welcome{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div style="position:relative";>
+
+    {% from "_formhelpers.html" import render_field %}
+<form method="POST" action="/line" id="form_forwards" style="">
+<h3>Select indices to control repo cruves from {{len_indices}} indices:</h3>
+    <div style="direction: rtl; overflow: auto; height: 500px; width: 400px;">
+
+        <input type="checkbox" onClick="toggle(this);" /> Select All<br />
+        {% for indice in indices %}
+            <input type="checkbox" name="{{indice}}" id="foo"> {{indice}} </input>
+        </br>
+        {% endfor %}
+    </div>
+    <br />
+    <div>
+        <input type=submit value='Control' name='submit_btn'>
+    </div>
+</form>
+</div>
+
+
+</div>
+
+<script language="JavaScript">
+    function toggle(source) {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i] != source)
+                checkboxes[i].checked = source.checked;
+        }
+    }
+ 
+</script>
+
+{% endblock %}

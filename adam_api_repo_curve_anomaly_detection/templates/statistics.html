@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Curves Control</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+</head>
+
+<body>
+    <center>
+        <h1>Statistics</h1>
+        <h3>Number of indices checked: {{number}}</h3>
+
+        <br />
+        <div style="margin:16px 0; overflow:auto;">
+            <h3>Model Performance:</h3>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td style="background-color:#99FF99;" width="50%">
+                            <b>True Positive: {{ TP }}</b>
+                        </td>
+                        <td style="background-color:#FF9999;">
+                            <b>False Positive: {{ FP }}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color:#FF9999;">
+                            <b>False Negative: {{ FN }}</b>
+                        </td>
+                        <td style="background-color:#99FF99;">
+                            <b>True Negative:{{ TN }}</b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div>
+                <ul style="list-style-type: circle">
+                    <li>Detection rate :{{dr}}</li>
+                    <li>False alarm rate :{{far}}</li>
+                </ul>
+                
+            </div>
+            
+        </div>
+        <br />
+        <br />
+        <br />
+        <div>
+            <h3>Index to review:</h3>
+            <ul style="list-style-type: circle">
+                {% for indice in indices %}
+                {% if correct_vs_incorrect[indice]=='correct' and err[indice] > 0.1 %}
+                 <li>{{indice}} : {{type_of_error[indice]}}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div>
+            <h3>Model False Performance:</h3>
+            <ul style="list-style-type: circle">
+                {% for indice in indices %}
+                {% if correct_vs_incorrect[indice]=='incorrect' %}
+                <li>{{indice}} : {{text[indice]}}</li>
+                <br />
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div>
+            <h3>Distribution of errors: </h3>
+            <canvas id="histo" width="450" height="300" name="chart"></canvas>
+
+        </div>
+
+        <script>
+            var labels = ['missing values', 'not smooth', 'discontinuity', 'other'];
+            var data = {{ error_distri }};
+            var barData = {
+                labels: labels,
+                datasets: [{
+                    fillColor: "rgba(151,187,205, 0.7)",
+                    strokeColor: "rgba(151,187,205, 1)",
+                    pointColor: "rgba(151,187,205, 1)",
+                    data: data
+
+                }
+                ]
+            }
+
+
+
+            Chart.defaults.global.animationSteps = 50;
+            Chart.defaults.global.tooltipYPadding = 16;
+            Chart.defaults.global.tooltipCornerRadius = 0;
+            Chart.defaults.global.tooltipTitleFontStyle = "normal";
+            Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+            Chart.defaults.global.animationEasing = "easeOutBounce";
+            Chart.defaults.global.responsive = false;
+            Chart.defaults.global.scaleLineColor = "black";
+            Chart.defaults.global.scaleFontSize = 16;
+
+
+            var mychart = document.getElementById("histo").getContext("2d");
+            steps = 1
+            max = 1.2
+            // draw bar chart
+            new Chart(mychart).Bar(barData, {
+                scaleOverride: true,
+                scaleSteps: steps,
+                scaleStepWidth: {{max_error}} + 1,
+                scaleStartValue: 0,
+                scaleShowVerticalLines: true,
+                scaleShowGridLines: true,
+                barShowStroke: true,
+                scaleShowLabels: true
+            }
+            );
+
+        </script>
+
+
+    </center>
+</body>
+</html>

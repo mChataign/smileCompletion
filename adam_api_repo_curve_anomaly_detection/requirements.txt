@@ -1,0 +1,13 @@
+flask
+wtforms
+pandas
+keras
+tensorflow
+pyunpack
+pythonnet
+xmltodict
+json
+pandas
+sqlite3
+numba
+seaborn
