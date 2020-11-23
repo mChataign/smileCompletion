@@ -79,7 +79,7 @@ def plotTails(obs, obsCompleted):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.xlabel("Maturity", fontsize=2*refSize, labelpad=3*refSize)
     plt.ylabel("Implied volatility", fontsize=2*refSize, labelpad=3*refSize)
-    plt.title("Implied volatility for highest strike", pad = 3*refSize, fontsize = 2*refSize)
+    plt.title("Implied volatility for highest log-Moneyness", pad = 3*refSize, fontsize = 2*refSize)
     plt.show()
     
     
@@ -93,7 +93,7 @@ def plotTails(obs, obsCompleted):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.xlabel("Maturity", fontsize=2*refSize, labelpad=3*refSize)
     plt.ylabel("Implied volatility", fontsize=2*refSize, labelpad=3*refSize)
-    plt.title("Implied volatility for lowest strike", pad = 3*refSize, fontsize = 2*refSize)
+    plt.title("Implied volatility for lowest log-Moneyness", pad = 3*refSize, fontsize = 2*refSize)
     plt.show()
     
     return
@@ -182,7 +182,8 @@ def buildGrid(ax, x, y, z,
               colorMapSystem = None, 
               plotType= None, 
               normOverride = None,
-              refPoints = None):
+              refPoints = None,
+              zLabelUser = None):
     xNbPoints = len(np.unique(x))
     yNbPoints = len(np.unique(y))
     
@@ -274,7 +275,7 @@ def buildGrid(ax, x, y, z,
     ax.view_init(elev=10., azim=azimut)
     ax.set_xlabel(xLabel, fontsize=30, labelpad=30)
     ax.set_ylabel(yLabel, fontsize=30, labelpad=30)
-    ax.set_zlabel(zLabel, fontsize=30, labelpad=30)
+    ax.set_zlabel(zLabel if zLabelUser is None else zLabelUser, fontsize=30, labelpad=30)
     ax.set_zlim(zMin, zMax)
     
     return pltSurface, pltSurface1
@@ -285,7 +286,8 @@ def plotGrid(surface,
              colorMapSystem=None, 
              plotType=None,
              refPoints = None,
-             minValUser = None):
+             minValUser = None,
+             zLabelUser = None):
     filteredSurface, filteredCoordinates = loadData.removePointsWithInvalidCoordinates(surface, coordinates)
     surfaceComplete = filteredSurface.dropna()
     if surfaceComplete.empty :
@@ -306,7 +308,8 @@ def plotGrid(surface,
                                        colorMapSystem = colorMapSystem,
                                        plotType = plotType, 
                                        normOverride = norm,
-                                       refPoints = refPoints)
+                                       refPoints = refPoints,
+                                       zLabelUser = zLabelUser)
     ax.set_title(title, pad = 30, fontsize = 20)#ax.set_title(surface.name)
     
     plt.show()
@@ -537,6 +540,7 @@ def plotCompletion(trueSurface,
              colorMapSystem=colorMapSystem, 
              plotType=plotType,
              refPoints = completionDiff.loc[refPoints.index] if refPoints is not None else None)
+    print("Completion RMSE : ", np.sqrt(np.nanmean(np.square(trueSurface - completedSurface))))
     return
 
 plt.rcParams['animation.embed_limit'] = 2**28

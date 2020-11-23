@@ -1,1 +1,2 @@
-./tmp/modelSaved/*
+tmp/modelSaved/*
+!tmp/modelSaved/.gitignore

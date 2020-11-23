@@ -374,7 +374,8 @@ class Teacher :
                                "Calendar condition for worst reconstruction on testing dataset", 
                                colorMapSystem=self.colorMapSystem, 
                                plotType=self.plotType,
-                               refPoints = None)
+                               refPoints = None,
+                               zLabelUser = "Implied total variance Theta")
         
         print("Minimal theta : ", thetaSurface.min().min())
         
